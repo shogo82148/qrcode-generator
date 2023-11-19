@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  API for generating QR codes
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      CodeUri: "."
+      Handler: qrcode
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref QrApi
+
+  QrApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: API for generating QR codes

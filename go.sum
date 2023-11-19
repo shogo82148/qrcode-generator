@@ -1,0 +1,4 @@
+github.com/shogo82148/qrcode v0.1.1 h1:lOpuYfaDd0dAtXFG4xPzT0v/7F9XAOlT/pX7BkNubCs=
+github.com/shogo82148/qrcode v0.1.1/go.mod h1:9iMbwqiNK2OVYlGWofyltFywc7guM+/oVdZjZiHxJDI=
+github.com/shogo82148/ridgenative v1.4.0 h1:yBsshqKQ86Y155CzgW3iC34DPwpcClceCJ8JQBd36UE=
+github.com/shogo82148/ridgenative v1.4.0/go.mod h1:PInWLpQIV0RsZI3j81ZH87hQ2knhDiMGbeDuTli3QIE=
