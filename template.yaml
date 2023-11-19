@@ -23,3 +23,25 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       Description: API for generating QR codes
+      Domain:
+        CertificateArn: !Ref Certificate
+        DomainName: "qr.shogo82148.com"
+
+  RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: "shogo82148.com."
+      Name: "qr.shogo82148.com"
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt ApiGatewayDomainNameV28a799e83c9.RegionalDomainName
+        HostedZoneId: !GetAtt ApiGatewayDomainNameV28a799e83c9.RegionalHostedZoneId
+
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: "qr.shogo82148.com"
+      ValidationMethod: "DNS"
+      DomainValidationOptions:
+        - DomainName: "qr.shogo82148.com"
+          HostedZoneId: Z1TR8BQNS8S1I7
