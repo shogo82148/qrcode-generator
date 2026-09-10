@@ -1,10 +1,10 @@
 module github.com/shogo82148/qrcode-generator
 
-go 1.22.2
+go 1.24.0
 
 require (
 	github.com/shogo82148/qrcode v0.2.0
-	github.com/shogo82148/ridgenative v1.4.0
+	github.com/shogo82148/ridgenative v1.5.2
 )
 
 require (
