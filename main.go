@@ -110,6 +110,16 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if size > 0 {
+		binimg, err := qr.EncodeToBitmap()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		minimumSize := binimg.Bounds().Dx() + quietZone*2
+		if size < minimumSize {
+			http.Error(w, fmt.Sprintf("size must be at least %d for this QR code", minimumSize), http.StatusBadRequest)
+			return
+		}
 		opts = append(opts, qrcode.WithWidth(size))
 	}
 
