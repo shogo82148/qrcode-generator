@@ -70,6 +70,16 @@ func TestGetQR_PNGSizeBelowMinimum(t *testing.T) {
 	}
 }
 
+func TestGetQR_PNGSizeBelowLargerMinimum(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&version=40&size=184")
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+	}
+	if got, want := rec.Body.String(), "size must be at least 185 for this QR code\n"; got != want {
+		t.Errorf("body = %q, want %q", got, want)
+	}
+}
+
 func TestGetQR_PNGMinimumSize(t *testing.T) {
 	rec := doRequest(t, "/qr?data=hello&size=29")
 	if rec.Code != http.StatusOK {
