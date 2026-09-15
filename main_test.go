@@ -286,6 +286,31 @@ func TestGetRMQR_Version(t *testing.T) {
 	}
 }
 
+func TestGetRMQR_Priority(t *testing.T) {
+	for _, tt := range []struct {
+		priority string
+		width    int
+		height   int
+	}{
+		{priority: "height", width: 63, height: 11},
+		{priority: "width", width: 31, height: 15},
+	} {
+		t.Run(tt.priority, func(t *testing.T) {
+			rec := doRequest(t, "/rmqr?data=1234567890123&priority="+tt.priority)
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+			}
+			img, err := png.Decode(rec.Body)
+			if err != nil {
+				t.Fatalf("failed to decode PNG: %v", err)
+			}
+			if got := img.Bounds().Size(); got.X != tt.width || got.Y != tt.height {
+				t.Errorf("image size = %v, want %dx%d", got, tt.width, tt.height)
+			}
+		})
+	}
+}
+
 func TestGetRMQR_InvalidParameters(t *testing.T) {
 	for _, target := range []string{
 		"/rmqr?data=hello&size=0",
