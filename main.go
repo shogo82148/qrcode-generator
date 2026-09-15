@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"image/png"
 	"net/http"
@@ -17,6 +18,9 @@ const quietZone = 4
 // maxSize limits memory and CPU consumption when rendering an image.
 const maxSize = 4096
 
+//go:embed index.html
+var playgroundHTML []byte
+
 func main() {
 	g := NewGenerator()
 	ridgenative.ListenAndServe(":8080", g)
@@ -31,12 +35,19 @@ func NewGenerator() *Generator {
 	g := &Generator{
 		mux: mux,
 	}
+	mux.HandleFunc("GET /{$}", g.getPlayground)
 	mux.HandleFunc("GET /qr", g.getQR)
 	return g
 }
 
 func (g *Generator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
+}
+
+func (g *Generator) getPlayground(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Content-Length", strconv.Itoa(len(playgroundHTML)))
+	_, _ = w.Write(playgroundHTML)
 }
 
 func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +147,7 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "image/png")
-	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()-1))
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 	_, _ = w.Write(buf.Bytes())
 }
 
