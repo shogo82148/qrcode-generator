@@ -2,6 +2,8 @@
 
 An API for generating QR code images.
 
+Open `/` in a browser to use the interactive playground.
+
 ```text
 GET /qr?data=hello&size=256
 ```
