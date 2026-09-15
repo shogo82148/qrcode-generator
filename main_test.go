@@ -241,3 +241,74 @@ func TestGetMicroQR_PNGSizeBelowMinimum(t *testing.T) {
 		t.Errorf("body = %q, want %q", got, want)
 	}
 }
+
+func TestGetRMQR_PNG(t *testing.T) {
+	rec := doRequest(t, "/rmqr?data=123456789012")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+	if got := rec.Header().Get("Content-Type"); got != "image/png" {
+		t.Errorf("Content-Type = %q, want image/png", got)
+	}
+	img, err := png.Decode(rec.Body)
+	if err != nil {
+		t.Fatalf("failed to decode PNG: %v", err)
+	}
+	if got := img.Bounds().Size(); got.X != 47 || got.Y != 11 {
+		t.Errorf("image size = %v, want 47x11", got)
+	}
+}
+
+func TestGetRMQR_SVGWithSize(t *testing.T) {
+	rec := doRequest(t, "/rmqr?data=hello&format=svg&size=94")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+	if got := rec.Header().Get("Content-Type"); got != "image/svg+xml" {
+		t.Errorf("Content-Type = %q, want image/svg+xml", got)
+	}
+	if got := rec.Body.Bytes(); !bytes.Contains(got, []byte(`width="94" height="22" viewBox="0 0 47 11"`)) {
+		t.Errorf("SVG does not contain proportional dimensions: %s", got)
+	}
+}
+
+func TestGetRMQR_Version(t *testing.T) {
+	rec := doRequest(t, "/rmqr?data=1&version=R11x27&level=H")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+	img, err := png.Decode(rec.Body)
+	if err != nil {
+		t.Fatalf("failed to decode PNG: %v", err)
+	}
+	if got := img.Bounds().Size(); got.X != 31 || got.Y != 15 {
+		t.Errorf("image size = %v, want 31x15", got)
+	}
+}
+
+func TestGetRMQR_InvalidParameters(t *testing.T) {
+	for _, target := range []string{
+		"/rmqr?data=hello&size=0",
+		"/rmqr?data=hello&format=gif",
+		"/rmqr?data=hello&level=L",
+		"/rmqr?data=hello&version=R8x43",
+		"/rmqr?data=hello&priority=depth",
+	} {
+		t.Run(target, func(t *testing.T) {
+			rec := doRequest(t, target)
+			if rec.Code != http.StatusBadRequest {
+				t.Errorf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+			}
+		})
+	}
+}
+
+func TestGetRMQR_PNGSizeBelowMinimum(t *testing.T) {
+	rec := doRequest(t, "/rmqr?data=123456789012&size=46")
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+	}
+	if got, want := rec.Body.String(), "size must be at least 47 for this rMQR code\n"; got != want {
+		t.Errorf("body = %q, want %q", got, want)
+	}
+}
