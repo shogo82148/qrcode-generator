@@ -136,7 +136,8 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "image/png")
-	w.Write(buf.Bytes())
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()-1))
+	_, _ = w.Write(buf.Bytes())
 }
 
 // writeSVG encodes the QR Code as an SVG image and writes it to w.
@@ -174,5 +175,6 @@ func (g *Generator) writeSVG(w http.ResponseWriter, qr *qrcode.QRCode, requested
 	buf.WriteString(`</svg>` + "\n")
 
 	w.Header().Set("Content-Type", "image/svg+xml")
-	w.Write(buf.Bytes())
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	_, _ = w.Write(buf.Bytes())
 }
