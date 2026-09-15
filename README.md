@@ -6,6 +6,7 @@ Open `/` in a browser to use the interactive playground.
 
 ```text
 GET /qr?data=hello&size=256
+GET /microqr?data=12345&size=256
 ```
 
 Query parameters:
@@ -15,3 +16,9 @@ Query parameters:
 - `format`: `png` (default) or `svg`
 - `level`: The error correction level: `L`, `M`, `Q`, or `H`
 - `version`: The QR code version (1–40)
+
+`/microqr` accepts the same parameters with these differences:
+
+- `level`: `check`, `L`, `M`, or `Q` (availability depends on the version)
+- `version`: The Micro QR code version (1–4, corresponding to M1–M4)
+- The natural PNG width includes the Micro QR code's two-module quiet zone and ranges from 15 to 21 pixels.
