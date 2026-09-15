@@ -4,16 +4,22 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"image"
 	"image/png"
 	"net/http"
 	"strconv"
 
+	"github.com/shogo82148/go-imaging/bitmap"
 	"github.com/shogo82148/qrcode"
+	"github.com/shogo82148/qrcode/microqr"
 	"github.com/shogo82148/ridgenative"
 )
 
 // quietZone is the number of modules of the margin around the QR Code.
 const quietZone = 4
+
+// microQuietZone is the number of modules required around a Micro QR Code.
+const microQuietZone = 2
 
 // maxSize limits memory and CPU consumption when rendering an image.
 const maxSize = 4096
@@ -37,6 +43,7 @@ func NewGenerator() *Generator {
 	}
 	mux.HandleFunc("GET /{$}", g.getPlayground)
 	mux.HandleFunc("GET /qr", g.getQR)
+	mux.HandleFunc("GET /microqr", g.getMicroQR)
 	return g
 }
 
@@ -117,7 +124,12 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if format == "svg" {
-		g.writeSVG(w, qr, size)
+		binimg, err := qr.EncodeToBitmap()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		g.writeSVG(w, binimg, size, quietZone)
 		return
 	}
 	if size > 0 {
@@ -151,14 +163,121 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(buf.Bytes())
 }
 
-// writeSVG encodes the QR Code as an SVG image and writes it to w.
-func (g *Generator) writeSVG(w http.ResponseWriter, qr *qrcode.QRCode, requestedSize int) {
+func (g *Generator) getMicroQR(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	data := q.Get("data")
+	opts := []microqr.EncodeOptions{microqr.WithQuietZone(microQuietZone)}
+
+	size, err := parseSize(q.Get("size"), q.Has("size"))
+	if err != nil {
+		http.Error(w, "invalid size", http.StatusBadRequest)
+		return
+	}
+	format, err := parseFormat(q.Get("format"), q.Has("format"))
+	if err != nil {
+		http.Error(w, "invalid format", http.StatusBadRequest)
+		return
+	}
+
+	if q.Has("level") {
+		switch q.Get("level") {
+		case "check", "CHECK", "Check":
+			opts = append(opts, microqr.WithLevel(microqr.LevelCheck))
+		case "L", "l":
+			opts = append(opts, microqr.WithLevel(microqr.LevelL))
+		case "M", "m":
+			opts = append(opts, microqr.WithLevel(microqr.LevelM))
+		case "Q", "q":
+			opts = append(opts, microqr.WithLevel(microqr.LevelQ))
+		default:
+			http.Error(w, "invalid level", http.StatusBadRequest)
+			return
+		}
+	}
+
+	version := microqr.Version(0)
+	if q.Has("version") {
+		v, err := strconv.Atoi(q.Get("version"))
+		if err != nil || v < 1 || v > 4 {
+			http.Error(w, "invalid version", http.StatusBadRequest)
+			return
+		}
+		version = microqr.Version(v)
+	}
+
+	qr, err := microqr.New([]byte(data), opts...)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if version > qr.Version {
+		qr.Version = version
+	}
+
 	binimg, err := qr.EncodeToBitmap()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if format == "svg" {
+		g.writeSVG(w, binimg, size, microQuietZone)
+		return
+	}
+	if size > 0 {
+		minimumSize := binimg.Bounds().Dx() + microQuietZone*2
+		if size < minimumSize {
+			http.Error(w, fmt.Sprintf("size must be at least %d for this Micro QR code", minimumSize), http.StatusBadRequest)
+			return
+		}
+		opts = append(opts, microqr.WithWidth(size))
+	}
+	img, err := qr.Encode(opts...)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	writePNG(w, img)
+}
 
+func parseSize(value string, present bool) (int, error) {
+	if !present {
+		return 0, nil
+	}
+	size, err := strconv.Atoi(value)
+	if err != nil || size <= 0 || size > maxSize {
+		return 0, fmt.Errorf("invalid size")
+	}
+	return size, nil
+}
+
+func parseFormat(value string, present bool) (string, error) {
+	if !present {
+		return "png", nil
+	}
+	if value != "png" && value != "svg" {
+		return "", fmt.Errorf("invalid format")
+	}
+	return value, nil
+}
+
+func writePNG(w http.ResponseWriter, img image.Image) {
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, img); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	_, _ = w.Write(buf.Bytes())
+}
+
+type binaryImage interface {
+	Bounds() image.Rectangle
+	BinaryAt(x, y int) bitmap.Color
+}
+
+// writeSVG encodes the QR Code as an SVG image and writes it to w.
+func (g *Generator) writeSVG(w http.ResponseWriter, binimg binaryImage, requestedSize, quietZone int) {
 	bounds := binimg.Bounds()
 	// size is the number of modules including the quiet zone on both sides.
 	size := bounds.Dx() + quietZone*2

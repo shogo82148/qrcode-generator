@@ -171,3 +171,73 @@ func TestGetQR_SVGAllowsSizeBelowPNGMinimum(t *testing.T) {
 		t.Errorf("SVG does not contain requested dimensions: %s", got)
 	}
 }
+
+func TestGetMicroQR_PNG(t *testing.T) {
+	rec := doRequest(t, "/microqr?data=12345&level=check")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+	if got := rec.Header().Get("Content-Type"); got != "image/png" {
+		t.Errorf("Content-Type = %q, want image/png", got)
+	}
+	img, err := png.Decode(rec.Body)
+	if err != nil {
+		t.Fatalf("failed to decode PNG: %v", err)
+	}
+	if got := img.Bounds().Dx(); got != 15 {
+		t.Errorf("image width = %d, want 15", got)
+	}
+}
+
+func TestGetMicroQR_SVG(t *testing.T) {
+	rec := doRequest(t, "/microqr?data=hello&format=svg&size=128&level=L")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+	if got := rec.Header().Get("Content-Type"); got != "image/svg+xml" {
+		t.Errorf("Content-Type = %q, want image/svg+xml", got)
+	}
+	if got := rec.Body.Bytes(); !bytes.Contains(got, []byte(`width="128" height="128"`)) {
+		t.Errorf("SVG does not contain requested dimensions: %s", got)
+	}
+}
+
+func TestGetMicroQR_Version(t *testing.T) {
+	rec := doRequest(t, "/microqr?data=hello&version=4&level=L")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+	img, err := png.Decode(rec.Body)
+	if err != nil {
+		t.Fatalf("failed to decode PNG: %v", err)
+	}
+	if got := img.Bounds().Dx(); got != 21 {
+		t.Errorf("image width = %d, want 21", got)
+	}
+}
+
+func TestGetMicroQR_InvalidParameters(t *testing.T) {
+	for _, target := range []string{
+		"/microqr?data=hello&size=0",
+		"/microqr?data=hello&format=gif",
+		"/microqr?data=hello&level=H",
+		"/microqr?data=hello&version=5",
+	} {
+		t.Run(target, func(t *testing.T) {
+			rec := doRequest(t, target)
+			if rec.Code != http.StatusBadRequest {
+				t.Errorf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+			}
+		})
+	}
+}
+
+func TestGetMicroQR_PNGSizeBelowMinimum(t *testing.T) {
+	rec := doRequest(t, "/microqr?data=12345&level=check&size=14")
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+	}
+	if got, want := rec.Body.String(), "size must be at least 15 for this Micro QR code\n"; got != want {
+		t.Errorf("body = %q, want %q", got, want)
+	}
+}
