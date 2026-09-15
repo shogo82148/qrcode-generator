@@ -35,6 +35,75 @@ func TestGetQR_PNG(t *testing.T) {
 	}
 }
 
+func TestGetQR_PNGWithSize(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&size=256")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	img, err := png.Decode(rec.Body)
+	if err != nil {
+		t.Fatalf("failed to decode PNG: %v", err)
+	}
+	if got := img.Bounds().Size(); got.X != 256 || got.Y != 256 {
+		t.Errorf("image size = %v, want 256x256", got)
+	}
+}
+
+func TestGetQR_InvalidSize(t *testing.T) {
+	for _, size := range []string{"", "abc", "0", "-1", "4097"} {
+		t.Run(size, func(t *testing.T) {
+			rec := doRequest(t, "/qr?data=hello&size="+size)
+			if rec.Code != http.StatusBadRequest {
+				t.Fatalf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+			}
+		})
+	}
+}
+
+func TestGetQR_PNGSizeBelowMinimum(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&size=1")
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+	}
+	if got, want := rec.Body.String(), "size must be at least 29 for this QR code\n"; got != want {
+		t.Errorf("body = %q, want %q", got, want)
+	}
+}
+
+func TestGetQR_PNGSizeBelowLargerMinimum(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&version=40&size=184")
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusBadRequest)
+	}
+	if got, want := rec.Body.String(), "size must be at least 185 for this QR code\n"; got != want {
+		t.Errorf("body = %q, want %q", got, want)
+	}
+}
+
+func TestGetQR_PNGMinimumSize(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&size=29")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	img, err := png.Decode(rec.Body)
+	if err != nil {
+		t.Fatalf("failed to decode PNG: %v", err)
+	}
+	if got := img.Bounds().Size(); got.X != 29 || got.Y != 29 {
+		t.Errorf("image size = %v, want 29x29", got)
+	}
+}
+
+func TestGetQR_MaxSize(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&format=svg&size=4096")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Body.String(); !bytes.Contains([]byte(got), []byte(`width="4096" height="4096"`)) {
+		t.Errorf("SVG does not contain maximum dimensions: %s", got)
+	}
+}
+
 func TestGetQR_InvalidFormat(t *testing.T) {
 	rec := doRequest(t, "/qr?data=hello&format=gif")
 	if rec.Code != http.StatusBadRequest {
@@ -67,5 +136,25 @@ func TestGetQR_SVG(t *testing.T) {
 	}
 	if !bytes.Equal(got, want) {
 		t.Errorf("SVG output does not match %s; run `go test -update` to regenerate if the change is intentional", golden)
+	}
+}
+
+func TestGetQR_SVGWithSize(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&format=svg&size=256")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Body.String(); !bytes.Contains([]byte(got), []byte(`<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"`)) {
+		t.Errorf("SVG does not contain requested dimensions: %s", got)
+	}
+}
+
+func TestGetQR_SVGAllowsSizeBelowPNGMinimum(t *testing.T) {
+	rec := doRequest(t, "/qr?data=hello&format=svg&size=1")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Body.String(); !bytes.Contains([]byte(got), []byte(`width="1" height="1"`)) {
+		t.Errorf("SVG does not contain requested dimensions: %s", got)
 	}
 }

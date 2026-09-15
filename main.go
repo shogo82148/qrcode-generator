@@ -14,6 +14,9 @@ import (
 // quietZone is the number of modules of the margin around the QR Code.
 const quietZone = 4
 
+// maxSize limits memory and CPU consumption when rendering an image.
+const maxSize = 4096
+
 func main() {
 	g := NewGenerator()
 	ridgenative.ListenAndServe(":8080", g)
@@ -40,6 +43,15 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	data := q.Get("data")
 	opts := make([]qrcode.EncodeOptions, 0, 4)
+	size := 0
+	if q.Has("size") {
+		var err error
+		size, err = strconv.Atoi(q.Get("size"))
+		if err != nil || size <= 0 || size > maxSize {
+			http.Error(w, "invalid size", http.StatusBadRequest)
+			return
+		}
+	}
 
 	format := "png"
 	if q.Has("format") {
@@ -94,8 +106,21 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if format == "svg" {
-		g.writeSVG(w, qr)
+		g.writeSVG(w, qr, size)
 		return
+	}
+	if size > 0 {
+		binimg, err := qr.EncodeToBitmap()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		minimumSize := binimg.Bounds().Dx() + quietZone*2
+		if size < minimumSize {
+			http.Error(w, fmt.Sprintf("size must be at least %d for this QR code", minimumSize), http.StatusBadRequest)
+			return
+		}
+		opts = append(opts, qrcode.WithWidth(size))
 	}
 
 	img, err := qr.Encode(opts...)
@@ -115,7 +140,7 @@ func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
 }
 
 // writeSVG encodes the QR Code as an SVG image and writes it to w.
-func (g *Generator) writeSVG(w http.ResponseWriter, qr *qrcode.QRCode) {
+func (g *Generator) writeSVG(w http.ResponseWriter, qr *qrcode.QRCode, requestedSize int) {
 	binimg, err := qr.EncodeToBitmap()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -128,9 +153,11 @@ func (g *Generator) writeSVG(w http.ResponseWriter, qr *qrcode.QRCode) {
 
 	var buf bytes.Buffer
 	fmt.Fprintf(&buf, `<?xml version="1.0" encoding="UTF-8"?>`+"\n")
-	fmt.Fprintf(&buf,
-		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" shape-rendering="crispEdges">`+"\n",
-		size, size)
+	buf.WriteString(`<svg xmlns="http://www.w3.org/2000/svg"`)
+	if requestedSize > 0 {
+		fmt.Fprintf(&buf, ` width="%d" height="%d"`, requestedSize, requestedSize)
+	}
+	fmt.Fprintf(&buf, ` viewBox="0 0 %d %d" shape-rendering="crispEdges">`+"\n", size, size)
 	fmt.Fprintf(&buf, `<rect width="%d" height="%d" fill="#ffffff"/>`+"\n", size, size)
 
 	// Draw all dark modules as a single path for a compact output.
