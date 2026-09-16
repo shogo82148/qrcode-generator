@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>プライバシーポリシー | QR Studio</title><style>
+:root { color-scheme: light; --ink:#13231d; --muted:#65716c; --green:#07563f; }
+* { box-sizing:border-box; } body { margin:0; background:#f6f3ea; color:var(--ink); font-family:system-ui,sans-serif; line-height:1.8; }
+main { max-width:880px; margin:auto; padding:32px 20px 56px; } header, footer nav { display:flex; flex-wrap:wrap; gap:18px; }
+a { color:var(--green); overflow-wrap:anywhere; } h1 { font-size:clamp(28px,5vw,40px); line-height:1.3; } h2 { margin-top:32px; font-size:23px; }
+section, article { background:white; padding:24px; border:1px solid #d9dfd8; border-radius:18px; margin:24px 0; overflow-wrap:anywhere; }
+blockquote { margin:16px 0; padding:12px; background:#fff5ce; } footer { margin-top:32px; font-size:14px; } label { display:block; margin:20px 0; } input { width:20px; height:20px; vertical-align:middle; }
+button, .button { display:inline-block; padding:12px 18px; background:var(--green); color:white; border:0; border-radius:8px; font:inherit; cursor:pointer; text-decoration:none; } button:disabled { background:#737c76; cursor:not-allowed; }
+:focus-visible { outline:3px solid #0c7c59; outline-offset:4px; } .note { color:var(--muted); font-size:14px; }
+@media(max-width:480px) { section,article { padding:18px; } }
+</style></head>
+<body><main><header><a href="/">QR Studio</a><a href="/docs">APIドキュメント</a></header><article><h1>プライバシーポリシー</h1>
+<p>施行日：2026年9月17日</p>
+<p>一野瀬翔吾（以下「運営者」）は、「QR Code Generator」（https://qr.shogo82148.com、以下「本サービス」）における情報の取扱いについて、次のとおり定めます。</p>
+<h2>1. 取り扱う情報と利用目的</h2>
+<h3>入力内容と生成設定</h3>
+<p>本サービスは、コードに変換する文字列、画像の形式・サイズ・誤り訂正レベルなどの設定をサーバーで受信し、画像の生成と応答のために処理します。操作画面では、入力や設定変更に応じて自動的にサーバーへ送信されます。</p>
+<p>アプリケーションには、入力内容や生成画像をデータベース・ファイルへ保存する機能や、生成履歴を管理する機能はありません。ただし、これは通信経路、ブラウザー、配信基盤などに情報が一切残らないことを意味しません。</p>
+<p>入力内容はGETリクエストのURLのクエリに含まれます。API URLを開いた際のブラウザー履歴やキャッシュ、利用者側の通信環境のログなどに残る可能性があります。API URLを共有すると、入力内容も共有されます。パスワード、認証情報、秘密情報、公開を意図しない個人情報などは入力しないでください。</p>
+<h3>通信情報と運用ログ</h3>
+<p>サービスの提供に伴い、配信基盤はIPアドレスやリクエストに関する情報を通信処理のために扱います。本サービスがAWSに記録する運用ログの項目は、アクセス日時のみです。IPアドレス、リクエストのパス、入力内容を含むクエリ文字列、User-Agentは、このログに記録しません。</p>
+<p>記録したアクセス日時は、本サービスの稼働状況の確認、障害調査の補助および安定運用のための負荷状況の把握に利用します。</p>
+<h3>お問い合わせ情報</h3>
+<p>運営者は、お問い合わせの際に提供された連絡先、氏名その他の記載内容を、お問い合わせへの対応および必要な連絡のために利用します。</p>
+<h2>2. Cookie・アクセス解析・広告</h2>
+<p>本サービスでは、アクセス解析ツールを利用しておらず、広告も掲載していません。</p>
+<p>本サイト（qr.shogo82148.com）ではCookieを使用していません。また、現行のアプリケーションには、ブラウザーのローカルストレージへの保存機能を組み込んでいません。</p>
+<p>リンク先のGoogleフォームなどの外部サービスでは、各サービスのポリシーに従ってCookie等が利用される場合があります。</p>
+<h2>3. 外部サービスの利用・第三者提供</h2>
+<p>本サービスの配信およびサーバー処理にはAmazon Web Services（AWS）を利用します。サービス提供に必要な情報は、その基盤で処理されます。</p>
+<p>AWSの契約先は、Amazon Web Services Japan G.K.（アマゾン ウェブ サービス ジャパン合同会社）です。</p>
+<p>QRコードの生成処理および運用ログの保存には、AWSの東京リージョン（日本）を利用しています。運営者は、入力内容および運用ログを国外のリージョンへ転送・複製する設定を行っていません。</p>
+<p>AWSへのサポート依頼に際しては、利用者の入力内容やお問い合わせに含まれる個人情報を提供せず、必要な技術情報や検証用データを用いて調査を依頼します。</p>
+<p>個人情報を含む非公開のお問い合わせの受付にはGoogle LLCが提供するGoogleフォームを、返信には個人向けGmailを利用します。返信先メールアドレス、お問い合わせ内容、同意の回答および返信履歴などは、これらのサービス上で処理・保存されます。Googleのサービスでは、これらの情報が日本国外で処理される場合があります。Googleによる情報の取扱いについては、<a href="https://policies.google.com/privacy?hl=ja">Googleのプライバシーポリシー</a>および<a href="https://policies.google.com/privacy/frameworks?hl=ja">データ転送に関する説明</a>をご参照ください。</p>
+<p>非公開のお問い合わせへの返信に利用するGmailについて、他のサービスへの自動転送・連携は行っていません。</p>
+<p>Googleフォームへ進む前に、<a href="/contact">お問い合わせ案内</a>に掲載した情報の取扱いをご確認いただき、同意をお願いしています。フォーム内でも同意の回答を記録します。</p>
+<p>不具合報告・機能要望・使い方などの技術的なお問い合わせには、<a href="https://github.com/shogo82148/qrcode-generator/issues">GitHub Issues</a>を利用します。投稿者のアカウント名、投稿内容、コメントなどは公開され、運営者はこれらを回答、問題の調査、サービスの改善および対応履歴の共有のために利用します。個人情報、パスワード、認証情報、秘密情報は投稿せず、再現例には検証用の文字列を使用してください。個人情報を含むお問い合わせはGoogleフォームをご利用ください。GitHubによる情報の取扱いと国外へのデータ移転については、<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHubのプライバシーステートメント</a>をご参照ください。</p>
+<p>運営者は、個人データについて、本人の同意がある場合、法令に基づく場合その他法令で認められる場合を除き、第三者に提供しません。利用目的の達成に必要な範囲で取扱いを委託する場合は、委託先に対して必要かつ適切な監督を行います。</p>
+<h2>4. 保存期間・削除</h2>
+<ul><li>入力内容・生成画像：アプリケーションによる永続保存は行わず、AWSの運用ログにも記録しません。</li><li>運用ログ（アクセス日時）：保存期間を90日間に設定し、期間経過後はAWSの保存期間設定に従って自動削除します。</li></ul>
+<p>非公開のお問い合わせ情報は、対応完了後1年間を目安に保存し、定期的な確認により削除します。ただし、継続対応や法令上の義務への対応に必要な場合は、必要な期間に限って保存します。</p>
+<p>削除の対象には、Googleフォームの回答およびGmailの返信履歴を含みます。</p>
+<p>公開されたGitHub Issuesとコメントは、問題の再発防止や改善履歴の共有のため、対応完了後も必要な範囲で保存・公開します。上記の1年間を目安とする保存期間は適用しません。個人情報の誤投稿などについては、非公開の窓口からご相談ください。第三者が取得した複製の削除までは保証できません。</p>
+<p>法令に基づく保存や不正利用・紛争への対応のために保存が必要な場合は、必要な範囲と期間に限って保持します。</p>
+<h2>5. 安全管理</h2>
+<p>運営者は、取り扱う個人データの漏えい、滅失または毀損を防ぐため、必要かつ適切な安全管理措置を講じます。</p>
+<p>運営者は、非公開のお問い合わせ情報へのアクセスを必要な範囲に限定し、管理用アカウントの多要素認証、利用端末のアクセス制限およびソフトウェアの更新などにより、不正アクセスや情報漏えいの防止に努めます。また、保存期間に従って不要な情報を削除します。</p>
+<h2>6. 開示等の請求・お問い合わせ</h2>
+<p>運営者が保有する個人データについて、利用目的の通知、開示、訂正、追加、削除、利用停止、消去、第三者提供の停止その他法令に基づく請求を希望する場合は、以下の窓口へご連絡ください。必要な本人確認を行ったうえで、法令に従って対応します。保存していない情報については、開示や復元に応じることができません。</p>
+<p>運営者：一野瀬翔吾<br>住所：個人情報保護法に基づく本人からの求めに応じて、遅滞なく回答します。お問い合わせ窓口よりご連絡ください。<br>個人情報に関する問い合わせ窓口：<a href="/contact">お問い合わせ案内（Googleフォーム）</a></p>
+<p>開示等の請求は、お問い合わせフォームから受け付けます。希望する対応と、対象となる情報を特定するために必要な事項をお知らせください。</p>
+<p>本人確認は、過去のお問い合わせ情報との照合および登録済みのメールアドレスへの確認連絡を基本とします。この方法で確認できない場合は、必要かつ合理的な範囲で別の確認方法をご案内します。代理人による請求の場合は、代理権についても確認します。</p>
+<p>本人確認後、法令に従って必要な調査・対応を行い、遅滞なく結果をご連絡します。開示方法については、本人の希望を踏まえて法令に従って対応します。対応できない場合は、その旨と理由をご説明します。</p>
+<p>開示等の請求に関する手数料は無料です。</p>
+<h2>7. ポリシーの変更</h2>
+<p>本ポリシーを変更する場合は、変更内容に応じて本サイト上で周知し、改定日または施行日を明示します。法令上、本人の同意やその他の手続が必要な場合は、必要な手続を行います。</p></article><footer><nav aria-label="関連ページ"><a href="/contact">お問い合わせ</a><a href="/terms">利用規約</a><a href="/privacy">プライバシーポリシー</a></nav></footer></main></body></html>
