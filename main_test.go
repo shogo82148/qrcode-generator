@@ -61,6 +61,19 @@ func TestGetMicroPlayground(t *testing.T) {
 	}
 }
 
+func TestGetRMQRPlayground(t *testing.T) {
+	rec := doRequest(t, "/rmqr/playground")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Header().Get("Content-Type"); got != "text/html; charset=utf-8" {
+		t.Errorf("Content-Type = %q, want text/html; charset=utf-8", got)
+	}
+	if !bytes.Contains(rec.Body.Bytes(), []byte("rMQR Studio")) {
+		t.Error("response does not contain the rMQR playground")
+	}
+}
+
 func TestGetQR_PNGWithSize(t *testing.T) {
 	rec := doRequest(t, "/qr?data=hello&size=256")
 	if rec.Code != http.StatusOK {

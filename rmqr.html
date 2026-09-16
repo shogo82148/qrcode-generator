@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="テキストやURLからQRコードをすぐに生成できるプレイグラウンド">
-  <title>QR Studio</title>
+  <meta name="description" content="テキストやURLから横長のrMQR（Rectangular Micro QR）コードをすぐに生成できるプレイグラウンド">
+  <title>rMQR Studio</title>
   <style>
     :root {
       color-scheme: light;
@@ -54,22 +54,23 @@
       width: 100%; border: 1px solid var(--line); border-radius: 13px; outline: none; color: var(--ink); background: rgba(255, 255, 255, .82); transition: border-color .2s, box-shadow .2s;
     }
     textarea:focus, input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(12, 124, 89, .1); }
-    textarea { min-height: 124px; resize: vertical; padding: 14px 15px; line-height: 1.55; }
+    textarea { min-height: 100px; resize: vertical; padding: 14px 15px; line-height: 1.55; }
     input, select { height: 46px; padding: 0 13px; }
     .count { float: right; color: var(--muted); font-weight: 500; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 21px; }
+    .grid .wide { grid-column: 1 / -1; }
     fieldset { margin: 22px 0 0; padding: 0; border: 0; }
-    .segments { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .segments { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .segments input { position: absolute; opacity: 0; pointer-events: none; }
     .segments label { margin: 0; padding: 11px; cursor: pointer; text-align: center; border: 1px solid var(--line); border-radius: 11px; background: rgba(255, 255, 255, .7); }
     .segments input:checked + label { color: white; border-color: var(--ink); background: var(--ink); }
     .segments input:focus-visible + label { box-shadow: 0 0 0 4px rgba(12, 124, 89, .15); }
     .hint { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .qr-frame { display: grid; place-items: center; width: min(100%, 330px); aspect-ratio: 1; padding: 22px; border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: 0 16px 40px rgba(19, 35, 29, .09); }
-    .qr-frame img { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+    .qr-frame { display: grid; place-items: center; width: min(100%, 420px); padding: 22px; border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: 0 16px 40px rgba(19, 35, 29, .09); }
+    .qr-frame img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
     .status { min-height: 22px; margin: 18px 0 12px; color: var(--muted); font-size: 13px; text-align: center; }
     .status.error { color: var(--danger); }
-    .actions { display: flex; gap: 10px; width: min(100%, 330px); }
+    .actions { display: flex; gap: 10px; width: min(100%, 420px); }
     button, .download { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 18px; border-radius: 13px; cursor: pointer; font-weight: 750; text-decoration: none; transition: transform .18s, background .18s; }
     button:active, .download:active { transform: translateY(1px); }
     .copy { flex: 1; color: var(--ink); border: 1px solid var(--line); background: white; }
@@ -96,21 +97,21 @@
 <body>
   <main class="shell">
     <header>
-      <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>QR Studio</div>
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>rMQR Studio</div>
       <nav class="nav">
-        <a href="/" aria-current="page">QR</a>
+        <a href="/">QR</a>
         <a href="/microqr/playground">Micro QR</a>
-        <a href="/rmqr/playground">rMQR</a>
+        <a href="/rmqr/playground" aria-current="page">rMQR</a>
       </nav>
     </header>
 
     <section class="intro">
-      <p class="eyebrow">QR Code Playground</p>
-      <h1>入力したら、すぐQR。</h1>
-      <p class="lede">URLやテキストを入力して、仕上がりをリアルタイムに確認。用途に合わせてサイズや形式も細かく調整できます。</p>
+      <p class="eyebrow">rMQR Code Playground</p>
+      <h1>横長の細い帯に、QR。</h1>
+      <p class="lede">rMQR（Rectangular Micro QR）は横長で高さの低い長方形のコードです。URLやテキストを入力して、サイズ・優先条件・バージョンを調整しながら仕上がりを確認できます。</p>
     </section>
 
-    <section class="workspace" aria-label="QRコード作成ツール">
+    <section class="workspace" aria-label="rMQRコード作成ツール">
       <form class="controls" id="controls">
         <div>
           <label for="data">内容 <span class="count"><span id="count">0</span> 文字</span></label>
@@ -119,8 +120,8 @@
 
         <div class="grid">
           <div>
-            <label for="size">画像サイズ</label>
-            <input id="size" name="size" type="number" min="29" max="4096" step="1" value="512" inputmode="numeric">
+            <label for="size">画像サイズ（幅）</label>
+            <input id="size" name="size" type="number" min="31" max="4096" step="1" value="512" inputmode="numeric">
           </div>
           <div>
             <label for="format">ファイル形式</label>
@@ -130,19 +131,27 @@
             </select>
           </div>
           <div>
-            <label for="version">QRバージョン</label>
+            <label for="version">バージョン</label>
             <select id="version" name="version">
               <option value="">自動</option>
             </select>
           </div>
           <div>
+            <label for="priority">優先条件</label>
+            <select id="priority" name="priority">
+              <option value="area">面積を最小化</option>
+              <option value="height">高さを最小化</option>
+              <option value="width">幅を最小化</option>
+            </select>
+          </div>
+          <div class="wide">
             <label for="preset">サンプル</label>
             <select id="preset">
               <option value="">選択してください</option>
               <option value="https://example.com">Webサイト</option>
               <option value="mailto:hello@example.com">メール</option>
               <option value="tel:+81312345678">電話番号</option>
-              <option value="WIFI:T:WPA;S:My Wi-Fi;P:password;;">Wi-Fi</option>
+              <option value="1234567890123">数字</option>
             </select>
           </div>
         </div>
@@ -150,25 +159,23 @@
         <fieldset>
           <legend>誤り訂正レベル</legend>
           <div class="segments">
-            <input type="radio" name="level" id="level-l" value="L"><label for="level-l">L</label>
-            <input type="radio" name="level" id="level-m" value="M" checked><label for="level-m">M</label>
-            <input type="radio" name="level" id="level-q" value="Q"><label for="level-q">Q</label>
-            <input type="radio" name="level" id="level-h" value="H"><label for="level-h">H</label>
+            <input type="radio" name="level" id="level-m" value="M" checked><label for="level-m">M（標準）</label>
+            <input type="radio" name="level" id="level-h" value="H"><label for="level-h">H（高い）</label>
           </div>
-          <p class="hint">レベルが高いほど、汚れや欠けがあっても読み取りやすくなります。</p>
+          <p class="hint">バージョンを「自動」にすると、優先条件に従って最適なサイズが選ばれます。バージョンを指定した場合、優先条件は無視されます。</p>
         </fieldset>
       </form>
 
       <div class="preview" aria-live="polite">
-        <div class="qr-frame"><img id="qr" alt="生成されたQRコード"></div>
-        <p class="status" id="status">QRコードを生成しています…</p>
+        <div class="qr-frame"><img id="qr" alt="生成されたrMQRコード"></div>
+        <p class="status" id="status">rMQRコードを生成しています…</p>
         <div class="actions">
           <button class="copy" id="copy" type="button">API URLをコピー</button>
           <a class="download" id="download" download>ダウンロード</a>
         </div>
       </div>
     </section>
-    <footer>入力内容は、QRコードを生成するためこのサーバーへ送信されます。</footer>
+    <footer>入力内容は、rMQRコードを生成するためこのサーバーへ送信されます。</footer>
   </main>
 
   <script>
@@ -177,6 +184,7 @@
     const size = document.querySelector('#size');
     const format = document.querySelector('#format');
     const version = document.querySelector('#version');
+    const priority = document.querySelector('#priority');
     const preset = document.querySelector('#preset');
     const qr = document.querySelector('#qr');
     const count = document.querySelector('#count');
@@ -186,25 +194,38 @@
     let currentURL = '';
     let timer;
 
-    for (let i = 1; i <= 40; i++) version.add(new Option(String(i), String(i)));
+    const versions = [
+      'R7x43', 'R7x59', 'R7x77', 'R7x99', 'R7x139',
+      'R9x43', 'R9x59', 'R9x77', 'R9x99', 'R9x139',
+      'R11x27', 'R11x43', 'R11x59', 'R11x77', 'R11x99', 'R11x139',
+      'R13x27', 'R13x43', 'R13x59', 'R13x77', 'R13x99', 'R13x139',
+      'R15x43', 'R15x59', 'R15x77', 'R15x99', 'R15x139',
+      'R17x43', 'R17x59', 'R17x77', 'R17x99', 'R17x139',
+    ];
+    for (const v of versions) version.add(new Option(v, v));
 
     function getURL() {
       const params = new URLSearchParams({ data: data.value, format: format.value });
       if (size.value) params.set('size', size.value);
       params.set('level', form.elements.level.value);
-      if (version.value) params.set('version', version.value);
-      return `/qr?${params}`;
+      if (version.value) {
+        params.set('version', version.value);
+      } else {
+        params.set('priority', priority.value);
+      }
+      return `/rmqr?${params}`;
     }
 
     function render() {
       count.textContent = [...data.value].length;
+      priority.disabled = version.value !== '';
       currentURL = getURL();
       status.className = 'status';
-      status.textContent = 'QRコードを生成しています…';
-      qr.alt = data.value ? `「${data.value.slice(0, 60)}」のQRコード` : '空のQRコード';
+      status.textContent = 'rMQRコードを生成しています…';
+      qr.alt = data.value ? `「${data.value.slice(0, 60)}」のrMQRコード` : '空のrMQRコード';
       qr.src = currentURL;
       download.href = currentURL;
-      download.download = `qrcode.${format.value}`;
+      download.download = `rmqr.${format.value}`;
     }
 
     function scheduleRender() {
@@ -220,11 +241,12 @@
     });
     qr.addEventListener('load', () => {
       status.className = 'status';
-      status.textContent = `${size.value || '自動'} px · ${format.value.toUpperCase()} · レベル ${form.elements.level.value}`;
+      const v = version.value || `自動（${priority.value === 'height' ? '高さ優先' : priority.value === 'width' ? '幅優先' : '面積優先'}）`;
+      status.textContent = `${v} · 幅 ${size.value || '自動'} px · ${format.value.toUpperCase()} · レベル ${form.elements.level.value}`;
     });
     qr.addEventListener('error', () => {
       status.className = 'status error';
-      status.textContent = '生成できませんでした。サイズや内容を確認してください。';
+      status.textContent = 'このデータでは生成できませんでした。内容を短くするか、バージョンやレベルを見直してください。';
     });
     copy.addEventListener('click', async () => {
       try {
