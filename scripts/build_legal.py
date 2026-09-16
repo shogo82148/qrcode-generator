@@ -43,7 +43,7 @@ def render(source):
 
 if __name__ == '__main__':
     for name, title in [('terms', '利用規約'), ('privacy', 'プライバシーポリシー')]:
-        source = (ROOT / 'legal' / f'{name}.md').read_text()
-        (ROOT / f'{name}.html').write_text(page(title, '<article>' + render(source) + '</article>', '（草案）' in source))
-    contact = (ROOT / 'legal' / 'contact-body.html').read_text()
-    (ROOT / 'contact.html').write_text(page('お問い合わせ', contact))
+        source = (ROOT / 'legal' / f'{name}.md').read_text(encoding="utf-8")
+        (ROOT / f'{name}.html').write_text(page(title, '<article>' + render(source) + '</article>', '（草案）' in source), encoding="utf-8")
+    contact = (ROOT / 'legal' / 'contact-body.html').read_text(encoding="utf-8")
+    (ROOT / 'contact.html').write_text(page('お問い合わせ', contact), encoding="utf-8")
