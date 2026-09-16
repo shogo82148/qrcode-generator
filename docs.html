@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="QR・Micro QR・rMQRコード画像生成APIのエンドポイントとパラメータ仕様">
+  <title>QR Studio</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #13231d;
+      --muted: #65716c;
+      --paper: #f6f3ea;
+      --card: rgba(255, 255, 255, .72);
+      --line: rgba(19, 35, 29, .14);
+      --green: #0c7c59;
+      --green-dark: #07563f;
+      --lime: #dafa57;
+      --danger: #b42318;
+      --code-bg: #10231c;
+      --shadow: 0 24px 70px rgba(27, 51, 42, .13);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 8%, rgba(218, 250, 87, .5), transparent 26rem),
+        radial-gradient(circle at 95% 88%, rgba(12, 124, 89, .14), transparent 30rem),
+        var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: inherit; }
+    code, pre, .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+    .shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 34px 0 64px; }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 54px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.03em; text-decoration: none; }
+    .brand-mark { display: grid; grid-template-columns: repeat(2, 7px); gap: 3px; padding: 8px; border-radius: 9px; background: var(--ink); }
+    .brand-mark i { width: 7px; height: 7px; background: white; border-radius: 1px; }
+    .brand-mark i:last-child { background: var(--lime); }
+    .nav { display: flex; gap: 8px; }
+    .nav a { padding: 8px 14px; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 700; border: 1px solid transparent; }
+    .nav a:hover { color: var(--ink); }
+    .nav a[aria-current="page"] { color: var(--ink); border-color: var(--line); background: var(--card); }
+
+    .intro { margin-bottom: 40px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 12px; color: var(--green-dark); font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--green); }
+    h1 { max-width: 720px; margin: 0; font-size: clamp(34px, 5vw, 58px); line-height: 1.04; letter-spacing: -.06em; }
+    .lede { max-width: 640px; margin: 18px 0 0; color: var(--muted); font-size: 17px; line-height: 1.7; }
+
+    .layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 40px; align-items: start; }
+    .toc { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 4px; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: var(--card); box-shadow: var(--shadow); backdrop-filter: blur(18px); }
+    .toc strong { display: block; margin-bottom: 8px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--green-dark); }
+    .toc a { padding: 7px 10px; border-radius: 9px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 650; }
+    .toc a:hover { color: var(--ink); background: rgba(255, 255, 255, .6); }
+
+    section.block { scroll-margin-top: 20px; margin-bottom: 44px; }
+    .card { border: 1px solid var(--line); border-radius: 24px; background: var(--card); box-shadow: var(--shadow); backdrop-filter: blur(18px); }
+    .card + .card { margin-top: 20px; }
+    .card-inner { padding: 26px 28px; }
+    h2 { margin: 0 0 6px; font-size: 26px; letter-spacing: -.03em; }
+    h3 { margin: 0; font-size: 20px; letter-spacing: -.02em; }
+    .desc { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+    p.desc:first-child { margin-top: 0; }
+
+    .method-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 4px; }
+    .method { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; background: var(--green); color: white; font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+    .path { font-size: 16px; font-weight: 700; }
+
+    pre { margin: 16px 0 0; padding: 16px 18px; border-radius: 14px; background: var(--code-bg); color: #e9f4ee; font-size: 13.5px; line-height: 1.65; overflow-x: auto; }
+    pre .cmt { color: #8fb7a6; }
+    p code, li code, td code { padding: 2px 6px; border-radius: 6px; background: rgba(19, 35, 29, .08); font-size: .88em; }
+
+    .table-wrap { margin-top: 18px; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); line-height: 1.6; }
+    thead th { background: rgba(255, 255, 255, .55); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--green-dark); white-space: nowrap; }
+    tbody tr:last-child td { border-bottom: 0; }
+    td:first-child { white-space: nowrap; }
+    .req { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: rgba(180, 35, 24, .1); color: var(--danger); font-size: 11px; font-weight: 700; }
+    .opt { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: rgba(19, 35, 29, .07); color: var(--muted); font-size: 11px; font-weight: 700; }
+    .muted-note { margin: 14px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+    .example { display: grid; grid-template-columns: 1fr 172px; gap: 22px; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--line); }
+    .example pre { margin-top: 0; }
+    .example .shot { display: grid; place-items: center; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: white; box-shadow: 0 16px 40px rgba(19, 35, 29, .09); }
+    .example .shot img { max-width: 100%; height: auto; image-rendering: pixelated; }
+
+    ul.plain { margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    ul.plain li { margin-bottom: 4px; }
+    ul.plain strong { color: var(--ink); }
+
+    .callout { display: flex; gap: 12px; margin-top: 18px; padding: 16px 18px; border-radius: 14px; background: rgba(12, 124, 89, .07); border: 1px solid rgba(12, 124, 89, .18); font-size: 14px; line-height: 1.65; color: var(--ink); }
+    .callout b { color: var(--green-dark); }
+
+    footer { margin-top: 48px; color: var(--muted); font-size: 12px; text-align: center; }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; gap: 24px; }
+      .toc { position: static; flex-direction: row; flex-wrap: wrap; }
+      .toc strong { width: 100%; }
+    }
+    @media (max-width: 820px) {
+      .shell { width: min(100% - 24px, 680px); padding-top: 20px; }
+      header { margin-bottom: 38px; }
+      .example { grid-template-columns: 1fr; }
+      .example .shot { width: 172px; }
+    }
+    @media (max-width: 480px) {
+      .shell { width: min(100% - 16px, 460px); }
+      .card-inner { padding: 22px 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>QR Studio</a>
+      <nav class="nav">
+        <a href="/qr/playground">QR</a>
+        <a href="/microqr/playground">Micro QR</a>
+        <a href="/rmqr/playground">rMQR</a>
+        <a href="/docs" aria-current="page">API</a>
+      </nav>
+    </header>
+
+    <section class="intro">
+      <p class="eyebrow">API Reference</p>
+      <h1>QRコード画像生成 API 仕様</h1>
+      <p class="lede">URLにパラメータを渡すだけで、QR・Micro QR・rMQRコードの画像を生成して返すシンプルなHTTP APIです。認証は不要で、<code>&lt;img&gt;</code> タグやスクリプトからそのまま利用できます。</p>
+    </section>
+
+    <div class="layout">
+      <aside class="toc" aria-label="目次">
+        <strong>目次</strong>
+        <a href="#overview">概要</a>
+        <a href="#common">共通仕様</a>
+        <a href="#qr">GET /qr</a>
+        <a href="#microqr">GET /microqr</a>
+        <a href="#rmqr">GET /rmqr</a>
+        <a href="#errors">エラー応答</a>
+      </aside>
+
+      <div>
+        <!-- Overview -->
+        <section class="block" id="overview">
+          <div class="card"><div class="card-inner">
+            <h2>概要</h2>
+            <p class="desc">3種類のコードを生成する3つのエンドポイントを提供します。すべて <code>GET</code> リクエストで、レスポンスは画像（PNG または SVG）です。クエリパラメータでエンコードする内容や見た目を指定します。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>エンドポイント</th><th>用途</th><th>特徴</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>GET /qr</code></td><td>通常のQRコード</td><td>URL・長文まで幅広く。バージョン1〜40</td></tr>
+                  <tr><td><code>GET /microqr</code></td><td>Micro QRコード</td><td>小さな面積・少量データ向け。M1〜M4</td></tr>
+                  <tr><td><code>GET /rmqr</code></td><td>rMQR（矩形Micro QR）</td><td>横長・帯状。狭いスペース向け</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout">
+              <span>💡</span>
+              <div>まず動きを試したいときは各プレイグラウンド（<a href="/qr/playground">QR</a> / <a href="/microqr/playground">Micro QR</a> / <a href="/rmqr/playground">rMQR</a>）で組み立て、「API URLをコピー」ボタンから呼び出しURLを取得できます。</div>
+            </div>
+          </div></div>
+        </section>
+
+        <!-- Common -->
+        <section class="block" id="common">
+          <div class="card"><div class="card-inner">
+            <h2>共通仕様</h2>
+            <ul class="plain">
+              <li><strong>メソッド:</strong> すべて <code>GET</code>。リクエストボディは使いません。</li>
+              <li><strong>認証:</strong> 不要です。</li>
+              <li><strong>レスポンス:</strong> 成功時は画像を直接返します。<code>Content-Type</code> は PNG が <code>image/png</code>、SVG が <code>image/svg+xml</code>。</li>
+              <li><strong>文字コード:</strong> <code>data</code> はUTF-8。URLエンコードして渡してください（例: 半角スペースは <code>%20</code>）。</li>
+              <li><strong>色:</strong> 前景は黒 <code>#000000</code>、背景は白 <code>#ffffff</code> 固定です。</li>
+              <li><strong>クワイエットゾーン:</strong> QRはコード周囲に4モジュール、Micro QR・rMQRは2モジュールの余白を含みます。</li>
+            </ul>
+            <div class="callout">
+              <span>🔒</span>
+              <div>入力した <code>data</code> は、画像を生成するためにサーバーへ送信されます。機微な情報を含める際はご注意ください。</div>
+            </div>
+          </div></div>
+        </section>
+
+        <!-- /qr -->
+        <section class="block" id="qr">
+          <div class="card"><div class="card-inner">
+            <div class="method-row"><span class="method">GET</span><span class="path mono">/qr</span></div>
+            <h2 style="margin-top:8px">QRコード</h2>
+            <p class="desc">最も一般的なQRコードを生成します。バージョン1〜40に対応し、URLや長めのテキストまで扱えます。</p>
+            <pre><span class="cmt"># 例: URLを256pxのPNGで生成</span>
+GET /qr?data=https://qr.shogo82148.com&amp;size=256</pre>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>パラメータ</th><th>値</th><th>説明</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>data</code><span class="req">必須</span></td>
+                    <td>文字列</td>
+                    <td>コードにエンコードする内容。</td>
+                  </tr>
+                  <tr>
+                    <td><code>size</code><span class="opt">任意</span></td>
+                    <td>整数 1〜4096</td>
+                    <td>出力画像の幅・高さ（px、正方形）。PNGではコードの自然な幅（クワイエットゾーン込み）以上が必要で、その最小値はデータとバージョンにより29〜185pxの範囲になります。SVGは全範囲を受け付けます。省略時はモジュール等倍。</td>
+                  </tr>
+                  <tr>
+                    <td><code>format</code><span class="opt">任意</span></td>
+                    <td><code>png</code> / <code>svg</code></td>
+                    <td>出力形式。既定は <code>png</code>。</td>
+                  </tr>
+                  <tr>
+                    <td><code>level</code><span class="opt">任意</span></td>
+                    <td><code>L</code> / <code>M</code> / <code>Q</code> / <code>H</code></td>
+                    <td>誤り訂正レベル。高いほど汚れや欠けに強くなりますが、その分データ容量は減ります。大文字・小文字どちらも可。</td>
+                  </tr>
+                  <tr>
+                    <td><code>version</code><span class="opt">任意</span></td>
+                    <td>整数 1〜40</td>
+                    <td>QRコードのバージョン（サイズ）。指定した値がデータに必要な最小バージョンより大きい場合のみ適用されます。省略時は自動選択。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="example">
+              <pre>GET /qr?data=https://qr.shogo82148.com
+       &amp;size=220&amp;level=H&amp;format=png</pre>
+              <div class="shot"><img src="/qr?data=https://qr.shogo82148.com&amp;size=220&amp;level=H" alt="QRコードの生成例" loading="lazy" width="220" height="220"></div>
+            </div>
+          </div></div>
+        </section>
+
+        <!-- /microqr -->
+        <section class="block" id="microqr">
+          <div class="card"><div class="card-inner">
+            <div class="method-row"><span class="method">GET</span><span class="path mono">/microqr</span></div>
+            <h2 style="margin-top:8px">Micro QRコード</h2>
+            <p class="desc">少量のデータを小さな面積に収めるMicro QRコードを生成します。パラメータは <code>/qr</code> と共通で、<code>level</code> と <code>version</code> の取りうる値が異なります。</p>
+            <pre><span class="cmt"># 例: 数字を256pxのPNGで生成</span>
+GET /microqr?data=12345&amp;size=256</pre>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>パラメータ</th><th>値</th><th>説明</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>data</code><span class="req">必須</span></td>
+                    <td>文字列</td>
+                    <td>コードにエンコードする内容。容量が小さいため短いデータ向けです。</td>
+                  </tr>
+                  <tr>
+                    <td><code>size</code><span class="opt">任意</span></td>
+                    <td>整数 1〜4096</td>
+                    <td>出力画像の幅・高さ（px）。PNGでは自然な幅（2モジュールのクワイエットゾーン込み、15〜21px）以上が必要です。SVGは全範囲可。</td>
+                  </tr>
+                  <tr>
+                    <td><code>format</code><span class="opt">任意</span></td>
+                    <td><code>png</code> / <code>svg</code></td>
+                    <td>出力形式。既定は <code>png</code>。</td>
+                  </tr>
+                  <tr>
+                    <td><code>level</code><span class="opt">任意</span></td>
+                    <td><code>check</code> / <code>L</code> / <code>M</code> / <code>Q</code></td>
+                    <td>誤り訂正レベル。利用できる値はバージョン（M1〜M4）によって異なります。<code>check</code> は誤り検出のみ。</td>
+                  </tr>
+                  <tr>
+                    <td><code>version</code><span class="opt">任意</span></td>
+                    <td>整数 1〜4</td>
+                    <td>Micro QRのバージョン（M1〜M4に対応）。指定値がデータに必要な最小バージョンより大きい場合のみ適用。省略時は自動選択。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="example">
+              <pre>GET /microqr?data=1234567
+       &amp;size=176&amp;level=M</pre>
+              <div class="shot"><img src="/microqr?data=1234567&amp;size=176&amp;level=M" alt="Micro QRコードの生成例" loading="lazy" width="176" height="176"></div>
+            </div>
+          </div></div>
+        </section>
+
+        <!-- /rmqr -->
+        <section class="block" id="rmqr">
+          <div class="card"><div class="card-inner">
+            <div class="method-row"><span class="method">GET</span><span class="path mono">/rmqr</span></div>
+            <h2 style="margin-top:8px">rMQR（矩形Micro QR）コード</h2>
+            <p class="desc">横長で高さの低い帯状のrMQRコードを生成します。狭いスペースへの印字に向いています。<code>size</code> は幅を指定し、高さはアスペクト比から自動計算されます。</p>
+            <pre><span class="cmt"># 例: URLを256px幅で生成</span>
+GET /rmqr?data=https://qr.shogo82148.com&amp;size=256</pre>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>パラメータ</th><th>値</th><th>説明</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>data</code><span class="req">必須</span></td>
+                    <td>文字列</td>
+                    <td>コードにエンコードする内容。</td>
+                  </tr>
+                  <tr>
+                    <td><code>size</code><span class="opt">任意</span></td>
+                    <td>整数 1〜4096</td>
+                    <td>出力画像の<strong>幅</strong>（px）。高さはrMQRのアスペクト比から計算されます。PNGでは自然な幅（2モジュールのクワイエットゾーン込み）以上が必要。SVGは全範囲可。</td>
+                  </tr>
+                  <tr>
+                    <td><code>format</code><span class="opt">任意</span></td>
+                    <td><code>png</code> / <code>svg</code></td>
+                    <td>出力形式。既定は <code>png</code>。</td>
+                  </tr>
+                  <tr>
+                    <td><code>level</code><span class="opt">任意</span></td>
+                    <td><code>M</code> / <code>H</code></td>
+                    <td>誤り訂正レベル。既定は <code>M</code>。</td>
+                  </tr>
+                  <tr>
+                    <td><code>version</code><span class="opt">任意</span></td>
+                    <td>rMQRバージョン名</td>
+                    <td>32種類のrMQRバージョン名のいずれか（<code>R7x43</code> 〜 <code>R17x139</code>、例: <code>R11x27</code>）。省略時は自動選択。</td>
+                  </tr>
+                  <tr>
+                    <td><code>priority</code><span class="opt">任意</span></td>
+                    <td><code>area</code> / <code>height</code> / <code>width</code></td>
+                    <td>自動選択時にどのバージョンを優先するかの基準。既定は <code>area</code>（面積最小）。<code>height</code> は高さ最小、<code>width</code> は幅最小を優先。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="example">
+              <pre>GET /rmqr?data=https://qr.shogo82148.com
+       &amp;size=300</pre>
+              <div class="shot"><img src="/rmqr?data=https://qr.shogo82148.com&amp;size=300" alt="rMQRコードの生成例" loading="lazy"></div>
+            </div>
+          </div></div>
+        </section>
+
+        <!-- Errors -->
+        <section class="block" id="errors">
+          <div class="card"><div class="card-inner">
+            <h2>エラー応答</h2>
+            <p class="desc">パラメータが不正な場合や、指定内容でコードを生成できない場合は、画像ではなくエラーメッセージ（<code>text/plain</code>）を返します。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>ステータス</th><th>主な原因</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>400 Bad Request</code></td>
+                    <td><code>size</code> が範囲外（1〜4096以外）／PNGの最小サイズ未満、<code>format</code>・<code>level</code>・<code>version</code>・<code>priority</code> が不正な値、データが指定バージョンの容量を超過、など。</td>
+                  </tr>
+                  <tr>
+                    <td><code>500 Internal Server Error</code></td>
+                    <td>画像エンコード時など、サーバー内部での予期しない失敗。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="muted-note">PNGでサイズが小さすぎる場合は、必要な最小サイズを含むメッセージ（例: <code class="mono">size must be at least 33 for this QR code</code>）が返ります。</p>
+          </div></div>
+        </section>
+      </div>
+    </div>
+
+    <footer>入力内容は、コードを生成するためこのサーバーへ送信されます。</footer>
+  </main>
+</body>
+</html>
