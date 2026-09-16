@@ -2,6 +2,8 @@ module github.com/shogo82148/qrcode-generator
 
 go 1.24.0
 
+toolchain go1.27.1
+
 require (
 	github.com/shogo82148/go-imaging v0.2.0
 	github.com/shogo82148/qrcode v0.2.0
