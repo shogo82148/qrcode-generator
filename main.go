@@ -30,6 +30,9 @@ const maxSize = 4096
 //go:embed index.html
 var playgroundHTML []byte
 
+//go:embed microqr.html
+var microPlaygroundHTML []byte
+
 func main() {
 	g := NewGenerator()
 	ridgenative.ListenAndServe(":8080", g)
@@ -46,6 +49,7 @@ func NewGenerator() *Generator {
 	}
 	mux.HandleFunc("GET /{$}", g.getPlayground)
 	mux.HandleFunc("GET /qr", g.getQR)
+	mux.HandleFunc("GET /microqr/playground", g.getMicroPlayground)
 	mux.HandleFunc("GET /microqr", g.getMicroQR)
 	mux.HandleFunc("GET /rmqr", g.getRMQR)
 	return g
@@ -56,9 +60,17 @@ func (g *Generator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Generator) getPlayground(w http.ResponseWriter, r *http.Request) {
+	writeHTML(w, playgroundHTML)
+}
+
+func (g *Generator) getMicroPlayground(w http.ResponseWriter, r *http.Request) {
+	writeHTML(w, microPlaygroundHTML)
+}
+
+func writeHTML(w http.ResponseWriter, html []byte) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Content-Length", strconv.Itoa(len(playgroundHTML)))
-	_, _ = w.Write(playgroundHTML)
+	w.Header().Set("Content-Length", strconv.Itoa(len(html)))
+	_, _ = w.Write(html)
 }
 
 func (g *Generator) getQR(w http.ResponseWriter, r *http.Request) {
