@@ -30,7 +30,7 @@ const maxSize = 4096
 //go:embed home.html
 var homeHTML []byte
 
-//go:embed index.html
+//go:embed qr.html
 var playgroundHTML []byte
 
 //go:embed microqr.html
