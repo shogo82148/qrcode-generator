@@ -36,7 +36,7 @@ func TestGetQR_PNG(t *testing.T) {
 }
 
 func TestGetPlayground(t *testing.T) {
-	rec := doRequest(t, "/")
+	rec := doRequest(t, "/qr/playground")
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
 	}
@@ -45,6 +45,16 @@ func TestGetPlayground(t *testing.T) {
 	}
 	if !bytes.Contains(rec.Body.Bytes(), []byte("QR Studio")) {
 		t.Error("response does not contain the playground")
+	}
+}
+
+func TestGetRoot_RedirectsToPlayground(t *testing.T) {
+	rec := doRequest(t, "/")
+	if rec.Code != http.StatusFound {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusFound)
+	}
+	if got := rec.Header().Get("Location"); got != "/qr/playground" {
+		t.Errorf("Location = %q, want /qr/playground", got)
 	}
 }
 

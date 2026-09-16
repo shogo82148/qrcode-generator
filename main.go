@@ -50,7 +50,8 @@ func NewGenerator() *Generator {
 	g := &Generator{
 		mux: mux,
 	}
-	mux.HandleFunc("GET /{$}", g.getPlayground)
+	mux.HandleFunc("GET /{$}", g.getRoot)
+	mux.HandleFunc("GET /qr/playground", g.getPlayground)
 	mux.HandleFunc("GET /qr", g.getQR)
 	mux.HandleFunc("GET /microqr/playground", g.getMicroPlayground)
 	mux.HandleFunc("GET /microqr", g.getMicroQR)
@@ -61,6 +62,10 @@ func NewGenerator() *Generator {
 
 func (g *Generator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
+}
+
+func (g *Generator) getRoot(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/qr/playground", http.StatusFound)
 }
 
 func (g *Generator) getPlayground(w http.ResponseWriter, r *http.Request) {
