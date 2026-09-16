@@ -197,6 +197,10 @@ Resources:
                 Action: "cloudformation:*"
                 Resource:
                   - !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/qrcode-generator/*"
+              - Sid: ReadSAMArtifactBucket
+                Effect: Allow
+                Action: "cloudformation:DescribeStacks"
+                Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/aws-sam-cli-managed-default/*"
               - Sid: CloudFormationDenyImport
                 Effect: Deny
                 Action: "cloudformation:*"

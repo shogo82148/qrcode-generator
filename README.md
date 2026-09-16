@@ -37,6 +37,14 @@ Query parameters:
 
 ## Deployment permissions
 
+GitHub Actions reads the `SourceBucket` output of the existing
+`aws-sam-cli-managed-default` stack and passes it to `sam deploy` with
+`--no-resolve-s3`. Provision this stack and bucket using an administrator or
+bootstrap role before running CI; the CI role only has `DescribeStacks` access
+to this stack. Local `make deploy` still uses SAM's automatic bucket management.
+After changing `cicd.yaml`, run `make cicd` with credentials authorized to update
+the CI/CD stack before rerunning GitHub Actions.
+
 `cicd.yaml` scopes deployment permissions to the `qrcode-generator` stack,
 its generated function and execution role, the configured Route 53 hosted zone,
 and the `qrcode-generator/` artifact prefix. Deploy the CI/CD stack in the same
