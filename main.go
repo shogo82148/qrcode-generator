@@ -27,6 +27,9 @@ const microQuietZone = 2
 // maxSize limits memory and CPU consumption when rendering an image.
 const maxSize = 4096
 
+//go:embed home.html
+var homeHTML []byte
+
 //go:embed index.html
 var playgroundHTML []byte
 
@@ -65,7 +68,7 @@ func (g *Generator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Generator) getRoot(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/qr/playground", http.StatusFound)
+	writeHTML(w, homeHTML)
 }
 
 func (g *Generator) getPlayground(w http.ResponseWriter, r *http.Request) {
