@@ -33,6 +33,9 @@ var playgroundHTML []byte
 //go:embed microqr.html
 var microPlaygroundHTML []byte
 
+//go:embed rmqr.html
+var rmqrPlaygroundHTML []byte
+
 func main() {
 	g := NewGenerator()
 	ridgenative.ListenAndServe(":8080", g)
@@ -51,6 +54,7 @@ func NewGenerator() *Generator {
 	mux.HandleFunc("GET /qr", g.getQR)
 	mux.HandleFunc("GET /microqr/playground", g.getMicroPlayground)
 	mux.HandleFunc("GET /microqr", g.getMicroQR)
+	mux.HandleFunc("GET /rmqr/playground", g.getRMQRPlayground)
 	mux.HandleFunc("GET /rmqr", g.getRMQR)
 	return g
 }
@@ -65,6 +69,10 @@ func (g *Generator) getPlayground(w http.ResponseWriter, r *http.Request) {
 
 func (g *Generator) getMicroPlayground(w http.ResponseWriter, r *http.Request) {
 	writeHTML(w, microPlaygroundHTML)
+}
+
+func (g *Generator) getRMQRPlayground(w http.ResponseWriter, r *http.Request) {
+	writeHTML(w, rmqrPlaygroundHTML)
 }
 
 func writeHTML(w http.ResponseWriter, html []byte) {
