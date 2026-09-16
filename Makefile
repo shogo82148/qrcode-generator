@@ -13,3 +13,8 @@ cicd:
 		--stack-name "qrcode-generator-cicd" \
 		--template-file "cicd.yaml" \
 		--capabilities CAPABILITY_NAMED_IAM
+
+.PHONY: deploy
+deploy:
+	sam build
+	sam deploy
