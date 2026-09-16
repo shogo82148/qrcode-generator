@@ -179,8 +179,7 @@ Resources:
               StringEquals:
                 "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
                 "token.actions.githubusercontent.com:environment": "production"
-              StringLike:
-                "token.actions.githubusercontent.com:sub": "repo:shogo82148/qrcode-generator:*"
+                "token.actions.githubusercontent.com:sub": "repo:shogo82148@1157344/qrcode-generator@720052443:environment:production"
       Policies:
         - PolicyName: SAMDeployment
           PolicyDocument:
@@ -198,6 +197,10 @@ Resources:
                 Action: "cloudformation:*"
                 Resource:
                   - !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/qrcode-generator/*"
+              - Sid: ReadSAMArtifactBucket
+                Effect: Allow
+                Action: "cloudformation:DescribeStacks"
+                Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/aws-sam-cli-managed-default/*"
               - Sid: CloudFormationDenyImport
                 Effect: Deny
                 Action: "cloudformation:*"
