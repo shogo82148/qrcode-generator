@@ -36,7 +36,7 @@ func TestGetQR_PNG(t *testing.T) {
 }
 
 func TestGetPlayground(t *testing.T) {
-	rec := doRequest(t, "/")
+	rec := doRequest(t, "/qr/playground")
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
 	}
@@ -45,6 +45,22 @@ func TestGetPlayground(t *testing.T) {
 	}
 	if !bytes.Contains(rec.Body.Bytes(), []byte("QR Studio")) {
 		t.Error("response does not contain the playground")
+	}
+}
+
+func TestGetRoot_LandingPage(t *testing.T) {
+	rec := doRequest(t, "/")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Header().Get("Content-Type"); got != "text/html; charset=utf-8" {
+		t.Errorf("Content-Type = %q, want text/html; charset=utf-8", got)
+	}
+	body := rec.Body.Bytes()
+	for _, link := range []string{"/qr/playground", "/microqr/playground", "/rmqr/playground"} {
+		if !bytes.Contains(body, []byte(link)) {
+			t.Errorf("landing page does not link to %q", link)
+		}
 	}
 }
 

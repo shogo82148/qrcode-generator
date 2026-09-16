@@ -27,7 +27,10 @@ const microQuietZone = 2
 // maxSize limits memory and CPU consumption when rendering an image.
 const maxSize = 4096
 
-//go:embed index.html
+//go:embed home.html
+var homeHTML []byte
+
+//go:embed qr.html
 var playgroundHTML []byte
 
 //go:embed microqr.html
@@ -50,7 +53,8 @@ func NewGenerator() *Generator {
 	g := &Generator{
 		mux: mux,
 	}
-	mux.HandleFunc("GET /{$}", g.getPlayground)
+	mux.HandleFunc("GET /{$}", g.getRoot)
+	mux.HandleFunc("GET /qr/playground", g.getPlayground)
 	mux.HandleFunc("GET /qr", g.getQR)
 	mux.HandleFunc("GET /microqr/playground", g.getMicroPlayground)
 	mux.HandleFunc("GET /microqr", g.getMicroQR)
@@ -61,6 +65,10 @@ func NewGenerator() *Generator {
 
 func (g *Generator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
+}
+
+func (g *Generator) getRoot(w http.ResponseWriter, r *http.Request) {
+	writeHTML(w, homeHTML)
 }
 
 func (g *Generator) getPlayground(w http.ResponseWriter, r *http.Request) {
