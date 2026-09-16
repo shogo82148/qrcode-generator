@@ -379,3 +379,20 @@ func TestGetRMQR_PNGSizeBelowMinimum(t *testing.T) {
 		t.Errorf("body = %q, want %q", got, want)
 	}
 }
+
+// Verify that the support and policy routes are reachable from every entry page.
+func TestSupportNavigation(t *testing.T) {
+	for _, path := range []string{"/", "/qr/playground", "/microqr/playground", "/rmqr/playground", "/docs", "/contact", "/terms", "/privacy"} {
+		t.Run(path, func(t *testing.T) {
+			rec := doRequest(t, path)
+			if rec.Code != http.StatusOK || rec.Header().Get("Content-Type") != "text/html; charset=utf-8" {
+				t.Fatalf("unexpected page response: %d %s", rec.Code, rec.Header().Get("Content-Type"))
+			}
+			for _, link := range []string{`href="/contact"`, `href="/terms"`, `href="/privacy"`} {
+				if !bytes.Contains(rec.Body.Bytes(), []byte(link)) {
+					t.Errorf("missing navigation link %s", link)
+				}
+			}
+		})
+	}
+}

@@ -42,6 +42,15 @@ var rmqrPlaygroundHTML []byte
 //go:embed docs.html
 var docsHTML []byte
 
+//go:embed contact.html
+var contactHTML []byte
+
+//go:embed terms.html
+var termsHTML []byte
+
+//go:embed privacy.html
+var privacyHTML []byte
+
 func main() {
 	g := NewGenerator()
 	ridgenative.ListenAndServe(":8080", g)
@@ -64,6 +73,9 @@ func NewGenerator() *Generator {
 	mux.HandleFunc("GET /rmqr/playground", g.getRMQRPlayground)
 	mux.HandleFunc("GET /rmqr", g.getRMQR)
 	mux.HandleFunc("GET /docs", g.getDocs)
+	mux.HandleFunc("GET /contact", func(w http.ResponseWriter, r *http.Request) { writeHTML(w, contactHTML) })
+	mux.HandleFunc("GET /terms", func(w http.ResponseWriter, r *http.Request) { writeHTML(w, termsHTML) })
+	mux.HandleFunc("GET /privacy", func(w http.ResponseWriter, r *http.Request) { writeHTML(w, privacyHTML) })
 	return g
 }
 

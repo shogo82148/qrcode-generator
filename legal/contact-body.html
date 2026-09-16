@@ -1,0 +1,38 @@
+<h1>お問い合わせ</h1>
+<p>内容に合わせて、窓口をお選びください。運営者：一野瀬翔吾</p>
+<section aria-labelledby="technical"><h2 id="technical">技術的なお問い合わせ</h2>
+<p>不具合報告・機能要望・使い方の質問はGitHub Issuesへお願いします。</p>
+<p><strong>投稿内容とアカウント名は公開されます。</strong>個人情報、パスワード、認証情報、秘密情報は記載せず、再現例には検証用の文字列を使用してください。</p>
+<a class="button" href="https://github.com/shogo82148/qrcode-generator/issues" rel="noreferrer">GitHub Issuesへ</a></section>
+<section aria-labelledby="private"><h2 id="private">非公開のお問い合わせ</h2>
+<p>個人情報に関するご相談などはGoogleフォームで受け付け、Gmailから返信します。以下の説明と<a href="/privacy">プライバシーポリシー</a>をご確認ください。</p>
+<h3>利用目的・保存期間</h3>
+<p>ご入力いただいた情報は、お問い合わせへの回答、対応履歴の管理および必要な連絡のために利用します。お問い合わせ情報は、対応完了後1年間を目安に保存し、定期的な確認により削除します。ただし、継続対応や法令上の義務への対応に必要な場合は、必要な期間に限って保存します。</p>
+<p>パスワード、認証情報、秘密情報や、お問い合わせに不要な個人情報は入力しないでください。</p>
+<h3>Googleによる情報の取扱いについて</h3>
+<p>本フォームの回答およびその後の返信に伴い、返信先メールアドレス、お問い合わせ内容、同意の回答、返信履歴などが、Google LLC（米国）のGoogleフォームおよびGmailで処理・保存されます。</p>
+<p>Googleは世界各地にサーバーを設置しており、情報が日本国外で処理される場合があります。運営者は、本フォームの回答が処理・保存されるすべての国を特定していません。提供先の所在国である米国と、実際の処理・保存場所は必ずしも一致しません。</p>
+<p>米国の個人情報保護制度については、以下の個人情報保護委員会の資料をご確認ください。連邦レベルの分野別の法令や州法などによる制度があり、日本とは制度が異なります。</p>
+<p>Googleは、通信の暗号化、不正アクセス防止のための対策、個人情報にアクセスできる担当者の制限などを公表しています。詳しくは、以下の資料をご確認ください。</p>
+<ul><li><a href="https://www.ppc.go.jp/enforcement/infoprovision/laws/offshore_report_america/" rel="noreferrer">個人情報保護委員会：米国の個人情報保護制度</a></li>
+<li><a href="https://policies.google.com/privacy?hl=ja" rel="noreferrer">Googleのプライバシーポリシー</a></li>
+<li><a href="https://policies.google.com/privacy/frameworks?hl=ja" rel="noreferrer">Googleのデータ転送に関する説明</a></li></ul>
+<p>説明文の版：お問い合わせ情報の取扱い v1.0</p>
+<p class="note">フォームを開くとGoogleとの通信が発生します。フォーム内でも同意をご確認いただき、その回答を記録します。</p>
+<form id="contact-consent">
+<label><input id="consent" type="checkbox" required autocomplete="off"> 上記の「お問い合わせ情報の取扱い v1.0」とプライバシーポリシーを確認し、お問い合わせへの対応のため、私の個人データが米国のGoogle LLCに提供され、GoogleフォームおよびGmailで処理・保存されることに同意します。</label>
+<button id="open-form" type="submit" disabled>同意してGoogleフォームへ</button>
+</form><noscript><p>フォームへの移動にはJavaScriptを有効にしてください。</p></noscript>
+</section>
+<script>
+const consent = document.getElementById('consent');
+const openForm = document.getElementById('open-form');
+function resetConsent() { consent.checked = false; openForm.disabled = true; }
+window.addEventListener('pageshow', resetConsent);
+consent.addEventListener('change', () => { openForm.disabled = !consent.checked; });
+document.getElementById('contact-consent').addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (!consent.checked) return;
+  window.location.assign('https://docs.google.com/forms/d/e/1FAIpQLSfTGhScEbumM1nEzX7bDJmFt5Qygnytng6yBIP65248H0IusA/viewform');
+});
+</script>
