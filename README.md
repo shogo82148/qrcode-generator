@@ -34,3 +34,26 @@ Query parameters:
 - `level`: `M` (default) or `H`
 - `version`: One of the 32 rMQR version names, from `R7x43` through `R17x139` (for example, `R11x27`)
 - `priority`: Version selection priority: `area` (default), `height`, or `width`
+
+## Deployment permissions
+
+`cicd.yaml` scopes deployment permissions to the `qrcode-generator` stack,
+its generated function and execution role, the configured Route 53 hosted zone,
+and the `qrcode-generator/` artifact prefix. Deploy the CI/CD stack in the same
+region as the application. Update these scopes if the stack name, function
+logical ID, domain, hosted zone, or artifact prefix changes.
+
+`acm:RequestCertificate` is the only Allow statement with `Resource: "*"`:
+[AWS does not support resource-level permissions for this action](https://docs.aws.amazon.com/service-authorization/latest/reference/list_acm.html).
+It is restricted to `qr.shogo82148.com`, DNS validation, and the stack's region.
+If review policy prohibits even this exception, provision the certificate
+separately and pass its ARN into the application template instead.
+
+Generated certificate and HTTP API IDs still require wildcard ARN suffixes;
+these permissions cover certificates in the account/region and HTTP APIs in the
+region, respectively. They are not restricted to a single existing resource.
+The function permissions boundary permits only writing its own CloudWatch logs.
+
+After applying the CI/CD stack, verify application creation, update, and rollback
+in AWS. Local template validation does not verify the deployment role's effective
+permissions or organization-level policies.

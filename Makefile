@@ -5,3 +5,16 @@ build-Function:
 .PHONY: test
 test:
 	go test -v ./...
+
+.PHONY: cicd
+cicd:
+	aws cloudformation deploy \
+		--region ap-northeast-1 \
+		--stack-name "qrcode-generator-cicd" \
+		--template-file "cicd.yaml" \
+		--capabilities CAPABILITY_NAMED_IAM
+
+.PHONY: deploy
+deploy:
+	sam build
+	sam deploy
