@@ -65,6 +65,8 @@
     }
     @media (max-width: 480px) {
       .shell { width: min(100% - 16px, 440px); }
+      header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .nav { flex-wrap: wrap; }
     }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
@@ -77,6 +79,7 @@
         <a href="/qr/playground">QR</a>
         <a href="/microqr/playground">Micro QR</a>
         <a href="/rmqr/playground">rMQR</a>
+        <a href="/docs">API</a>
       </nav>
     </header>
 
