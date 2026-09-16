@@ -2,7 +2,8 @@
 
 An API for generating QR code images.
 
-Open `/` in a browser to use the interactive playground.
+Open `/` in a browser to use the interactive playground. A dedicated Micro QR
+playground is available at `/microqr/playground`.
 
 ```text
 GET /qr?data=hello&size=256
