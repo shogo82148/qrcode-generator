@@ -121,11 +121,13 @@ Resources:
                   - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/qrcode-generator-Function-logs"
                   - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/qrcode-generator-Function-logs:*"
               # DescribeLogGroups is used by the log-group resource handler to read
-              # current state; it is scoped to the log-group resource type.
+              # current state. It does not support resource-level permissions, so
+              # it must be granted on "*".
+              # https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatchlogs.html
               - Sid: DescribeLogGroups
                 Effect: Allow
                 Action: "logs:DescribeLogGroups"
-                Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
+                Resource: "*"
               - Sid: Route53Records
                 Effect: Allow
                 Action:
