@@ -17,11 +17,27 @@ Resources:
       Handler: qrcode
       Runtime: provided.al2023
       Architectures: [arm64]
+      # Send logs to an explicitly managed log group so the retention period
+      # is controlled by this template instead of Lambda's default (never
+      # expire).
+      LoggingConfig:
+        LogGroup: !Ref FunctionLogGroup
       Events:
         CatchAll:
           Type: HttpApi
           Properties:
             ApiId: !Ref QrApi
+
+  # Operational log group for the function. RetentionInDays enforces the
+  # 90-day retention promised in the privacy policy, so the commitment is
+  # backed by infrastructure rather than a manual console setting.
+  # The name matches the permissions boundary pattern
+  # (/aws/lambda/qrcode-generator-Function-*) so the function role can write.
+  FunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-Function-logs"
+      RetentionInDays: 90
 
   QrApi:
     Type: AWS::Serverless::HttpApi
