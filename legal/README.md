@@ -40,10 +40,10 @@
 
 - 本番へのデプロイと `/contact`・`/terms`・`/privacy` の公開確認（2026年9月17日、いずれも200応答を確認）
 - サイトおよびAPIドキュメントから両文書へのリンク、入力が自動送信される旨の入力欄付近での案内
+- GoogleフォームへのプライバシーポリシーURL（`https://qr.shogo82148.com/privacy`）の記載（2026年9月17日、運営者確認済み）
 
 残りの公開作業：
 
-- Googleフォームの「【公開後のURL】」を `https://qr.shogo82148.com/privacy` に置き換える
 - 利用規約の同意・周知方法を利用導線に合わせて整備するか判断する
 
 施行日は確定し、本文の【要確認】と草案注記は除去済みです。
@@ -63,4 +63,4 @@
 
 ## ページの更新
 
-`legal/terms.md`、`legal/privacy.md`、`legal/contact-body.html`を編集したら、`python3 scripts/build_legal.py`でHTMLを再生成してください。`/contact`、`/terms`、`/privacy`から閲覧できます。規約・ポリシーの施行日は2026年9月17日です。草案表示と草案用noindexは除去済みです。本番はデプロイ済みのため、Googleフォームのポリシーリンクを `https://qr.shogo82148.com/privacy` に設定してください（未対応の場合）。サイトの同意チェックは保存せず、同意の記録はフォーム回答側で行います。
+`legal/terms.md`、`legal/privacy.md`、`legal/contact-body.html`を編集したら、`python3 scripts/build_legal.py`でHTMLを再生成してください。`/contact`、`/terms`、`/privacy`から閲覧できます。規約・ポリシーの施行日は2026年9月17日です。草案表示と草案用noindexは除去済みです。本番はデプロイ済みで、Googleフォームのポリシーリンクは `https://qr.shogo82148.com/privacy` に設定済みです。サイトの同意チェックは保存せず、同意の記録はフォーム回答側で行います。
