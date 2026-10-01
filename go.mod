@@ -6,7 +6,7 @@ toolchain go1.27.1
 
 require (
 	github.com/shogo82148/go-imaging v0.2.0
-	github.com/shogo82148/qrcode v0.2.0
+	github.com/shogo82148/qrcode v0.3.0
 	github.com/shogo82148/ridgenative v1.5.2
 )
 
