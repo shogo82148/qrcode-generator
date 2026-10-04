@@ -6,11 +6,11 @@ toolchain go1.27.1
 
 require (
 	github.com/shogo82148/go-imaging v0.2.0
-	github.com/shogo82148/qrcode v0.3.0
+	github.com/shogo82148/qrcode v0.3.1
 	github.com/shogo82148/ridgenative v1.5.2
 )
 
 require (
-	github.com/shogo82148/float16 v0.5.0 // indirect
+	github.com/shogo82148/float16 v0.5.1 // indirect
 	github.com/shogo82148/int128 v0.2.1 // indirect
 )
