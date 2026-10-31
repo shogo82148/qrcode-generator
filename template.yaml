@@ -24,6 +24,11 @@ Resources:
       # the previous request's buffers. The 128 MB default would be OOM-killed,
       # so size the memory to cover that peak with headroom.
       MemorySize: 1024
+      # A maximum-size PNG takes about 3-4 seconds to render at this memory
+      # size (Lambda allocates CPU in proportion to memory), so the 3-second
+      # default timeout fails those requests. Keep this well under the HTTP
+      # API's 30-second integration limit.
+      Timeout: 10
       # Send logs to an explicitly managed log group so the retention period
       # is controlled by this template instead of Lambda's default (never
       # expire).
