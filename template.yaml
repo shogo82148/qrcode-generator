@@ -17,6 +17,13 @@ Resources:
       Handler: qrcode
       Runtime: provided.al2023
       Architectures: [arm64]
+      # Rendering a PNG at the maximum size (maxSize = 4096 in main.go)
+      # allocates about 192 MiB of image buffers per request: an 8-byte-per-pixel
+      # intermediate plus the 4-byte-per-pixel output. A warm instance that serves
+      # such requests back to back peaks at about 470 MiB before the Go GC frees
+      # the previous request's buffers. The 128 MB default would be OOM-killed,
+      # so size the memory to cover that peak with headroom.
+      MemorySize: 1024
       # Send logs to an explicitly managed log group so the retention period
       # is controlled by this template instead of Lambda's default (never
       # expire).
