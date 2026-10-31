@@ -25,6 +25,8 @@ const quietZone = 4
 const microQuietZone = 2
 
 // maxSize limits memory and CPU consumption when rendering an image.
+// The function's MemorySize in template.yaml is sized for this value;
+// raise it as well if maxSize is increased.
 const maxSize = 4096
 
 //go:embed home.html
